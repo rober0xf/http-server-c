@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -41,6 +42,19 @@ int main() {
     int cfd = accept(sfd, (struct sockaddr *)&client_addr, &client_addr_size);
     if (cfd == -1) {
         handle_error("error accept");
+    }
+
+    char message[] = "message to the client\n";
+    result = write(cfd, message, strlen(message)); // we could use sizeof(msg)-1, but it cant handle pointers. this isnt the case but anyways
+    if (result == -1) {
+        handle_error("error write");
+    }
+
+    char buffer[1024] = {0};
+    result = read(cfd, buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+    if (result == -1) {
+        handle_error("error read");
     }
 
     // closes a file descriptor, so that it no longer refers to any file and may be reused
